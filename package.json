@@ -1,0 +1,13 @@
+{
+  "name": "read-book-core",
+  "author": "Eduardo Wesley",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "jest": "^25.2.4"
+  }
+}
