@@ -30,6 +30,7 @@ module.exports = {
       email,
       password: encryptPassword(password),
       token: generateUniqueToken(),
+      access_level: 'admin',
       created_at: date
     };
 

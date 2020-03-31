@@ -3,11 +3,13 @@ const app = require('../../src/app');
 const connection = require('../../src/database/connection');
 
 async function createUser(userData) {
-  const data = userData || {
+  const data = {
     username: 'edumudu',
     email: 'eduardomudutiu@gmail.com',
     password: '123456',
-    access_level: 'admin'
+    access_level: 'admin',
+    
+    ...userData
   };
 
   return await request(app)
@@ -15,16 +17,12 @@ async function createUser(userData) {
     .send(data);
 }
 
-describe('USER', () => {
-  beforeEach(async () => {
-    await connection.migrate.rollback();
-    await connection.migrate.latest();
-  });
+afterAll(async () => await connection.destroy());
 
-  afterAll(async () => {
-    await connection.migrate.rollback();
-    await connection.destroy();
-  });
+describe('USER', () => {
+  beforeEach(async () => await connection.migrate.latest());
+  // afterEach(async () => await connection.migrate.rollback());
+
   it('Should be able to create a new user', async () => {
       const response = await createUser();
 
