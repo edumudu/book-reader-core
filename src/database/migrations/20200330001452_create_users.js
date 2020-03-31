@@ -5,6 +5,10 @@ exports.up = function(knex) {
     table.string('email').notNullable();
     table.string('password').notNullable();
     table.string('token').notNullable();
+    table.enu('access_level', ['admin', 'mod', 'customer'])
+      .defaultTo('customer')
+      .notNullable();
+    
     table.date('created_at').notNullable();
   });
 };

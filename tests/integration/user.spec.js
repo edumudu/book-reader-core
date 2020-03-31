@@ -7,6 +7,7 @@ async function createUser(userData) {
     username: 'edumudu',
     email: 'eduardomudutiu@gmail.com',
     password: '123456',
+    access_level: 'admin'
   };
 
   return await request(app)
@@ -32,6 +33,7 @@ describe('USER', () => {
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
       expect(response.body).toHaveProperty('created_at');
+      expect(response.body).toHaveProperty('access_level');
       expect(response.body.token).toHaveLength(8);
       expect(response.body.created_at).toBe(date);
       expect(typeof response.body.id).toBe('number');
