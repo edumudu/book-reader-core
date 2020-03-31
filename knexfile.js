@@ -8,10 +8,14 @@ module.exports = {
       host :    'localhost',
       database: 'book_read',
       user:     'root',
-      password: ''
+      password: '',
+      dateStrings: true
     },
     migrations: {
       directory: './src/database/migrations'
+    },
+    seeds: {
+      directory: './src/database/seeds'
     }
   },
 
@@ -21,10 +25,14 @@ module.exports = {
       host :    'localhost',
       database: 'book_read_test',
       user:     'root',
-      password: ''
+      password: '',
+      dateStrings: true
     },
     migrations: {
       directory: './src/database/migrations'
+    },
+    seeds: {
+      directory: './src/database/seeds'
     }
   },
 
