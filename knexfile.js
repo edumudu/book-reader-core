@@ -5,20 +5,34 @@ module.exports = {
   development: {
     client: 'mysql',
     connection: {
-      host : '127.0.0.1',
+      host :    'localhost',
       database: 'book_read',
-      use:      'root',
-      password: ''
+      user:     'root',
+      password: '',
+      dateStrings: true
+    },
+    migrations: {
+      directory: './src/database/migrations'
+    },
+    seeds: {
+      directory: './src/database/seeds'
     }
   },
 
   test: {
     client: 'mysql',
     connection: {
-      host : '127.0.0.1',
+      host :    'localhost',
       database: 'book_read_test',
-      use:      'root',
-      password: ''
+      user:     'root',
+      password: '',
+      dateStrings: true
+    },
+    migrations: {
+      directory: './src/database/migrations'
+    },
+    seeds: {
+      directory: './src/database/seeds'
     }
   },
 
