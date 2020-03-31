@@ -9,14 +9,16 @@ Router.post('/user', celebrate({
   [Segments.BODY]: Joi.object().keys({
     username: Joi.string().required(),
     email: Joi.string().email().required(),
-    password: Joi.string().required()
+    password: Joi.string().required(),
+    access_level: Joi.string()
   })
 }), UserController.create);
 
 Router.put('/user/:id', celebrate({
   [Segments.BODY]: Joi.object().keys({
     username: Joi.string(),
-    password: Joi.string()
+    password: Joi.string(),
+    access_level: Joi.string(),
   }),
 
   [Segments.HEADERS]: Joi.object({
