@@ -26,7 +26,7 @@ describe('Category', () => {
   });
 
   it('Should list all categorys', async () => {
-    await connection.seed.run('seed_category');
+    await connection.seed.run({specific: 'seed_category' });
 
     const response = await request(app)
       .get('/category')
@@ -46,7 +46,7 @@ describe('Category', () => {
 
   it('Should be able to delete a category', async () => {
     const category = createCategory();
-    await connection.seed.run('seed_user');
+    await connection.seed.run({ specific: 'seed_user' });
 
     const user = connection('tb_users').select('*').first();
 
@@ -60,7 +60,7 @@ describe('Category', () => {
 
   it('Should be able to edit a category', () => {
     const category = createCategory();
-    await connection.seed.run('seed_user');
+    await connection.seed.run({ specific: 'seed_user'});
 
     const user = connection('tb_users').select('*').first();
 
