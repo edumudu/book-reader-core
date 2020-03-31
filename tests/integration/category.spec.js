@@ -12,6 +12,7 @@ async function createCategory(data = {}) {
 
   const categoryData = {
     name: 'fiction',
+    
     ...data
   };
 

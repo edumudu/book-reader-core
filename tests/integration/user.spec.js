@@ -3,11 +3,13 @@ const app = require('../../src/app');
 const connection = require('../../src/database/connection');
 
 async function createUser(userData) {
-  const data = userData || {
+  const data = {
     username: 'edumudu',
     email: 'eduardomudutiu@gmail.com',
     password: '123456',
-    access_level: 'admin'
+    access_level: 'admin',
+    
+    ...userData
   };
 
   return await request(app)
