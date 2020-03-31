@@ -21,17 +21,19 @@ describe('USER', () => {
   });
 
   afterAll(async () => {
+    await connection.migrate.rollback();
     await connection.destroy();
   });
-
   it('Should be able to create a new user', async () => {
       const response = await createUser();
+
+      const date = new Date().toISOString().substr(0, 10);
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
       expect(response.body).toHaveProperty('created_at');
       expect(response.body.token).toHaveLength(8);
-      expect(response.body.created_at).toBe(new Date().toLocaleDateString());
+      expect(response.body.created_at).toBe(date);
       expect(typeof response.body.id).toBe('number');
   });
 
@@ -50,7 +52,7 @@ describe('USER', () => {
     const userResponse = await createUser();
 
     const newFields = {
-      name: 'caju',
+      username: 'caju',
       password: '7654'
     };
 
@@ -60,21 +62,6 @@ describe('USER', () => {
       .send(newFields);
     
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ ...userResponse.body, ...newFields });
-  });
-
-  it('Should be able login in account', async () => {
-    const userResponse = await createUser();
-
-    const response = await request(app)
-      .post('/user/session')
-      .send({
-        email: userResponse.body.email,
-        password: userResponse.body.password
-      });
-
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('token');
-    expect(response.body).toEqual(userResponse.body)
+    expect({ ...userResponse.body, ...newFields }).toEqual(response.body);
   });
 });
