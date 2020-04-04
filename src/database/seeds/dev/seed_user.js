@@ -1,5 +1,5 @@
-const encryptPassword = require('../../utils/encryptPassword');
-const generateUniqueToken = require('../../utils/generateUniqueToken');
+const encryptPassword = require('../../../utils/encryptPassword');
+const generateUniqueToken = require('../../../utils/generateUniqueToken');
 
 exports.seed = function(knex) {
   // Deletes ALL existing entries

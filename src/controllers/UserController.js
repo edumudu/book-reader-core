@@ -1,20 +1,15 @@
 const generateUniqueToken = require('../utils/generateUniqueToken');
 const encryptPassword = require('../utils/encryptPassword');
 const connection = require('../database/connection');
+const { errors } = require('../variables/controller');
 
 const table = 'tb_users';
 
-const errors = {
-  syntax(action) { return { error: `Invalid syntaxy to ${action} user.` }},
-  permition: { error: 'Operation not permitted.' },
-  notFound: { error: 'User not found' }
-}
-
 async function verifyUserToken(id, token) {
   const user = await connection(table)
-  .where('id', id)
-  .select('token')
-  .first();
+    .where('id', id)
+    .select('token')
+    .first();
 
   return user.token === token;
 }
@@ -72,8 +67,8 @@ module.exports = {
     
     try {
       await connection(table)
-      .where('id', id)
-      .update(newValues)
+        .where('id', id)
+        .update(newValues)
 
       return response.status(200).send({ ...user, ...newValues });
     } catch (err) {
