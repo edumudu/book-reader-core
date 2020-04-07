@@ -4,7 +4,6 @@ exports.up = function(knex) {
     table.string('username').notNullable();
     table.string('email').notNullable();
     table.string('password').notNullable();
-    table.string('token').notNullable();
     table.enu('access_level', ['admin', 'mod', 'customer'])
       .defaultTo('customer')
       .notNullable();

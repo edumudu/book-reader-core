@@ -1,5 +1,5 @@
 const encryptPassword = require('../../../utils/encryptPassword');
-const generateUniqueToken = require('../../../utils/generateUniqueToken');
+const generateToken = require('../../../utils/generateToken');
 
 exports.seed = function(knex) {
   // Deletes ALL existing entries
@@ -13,7 +13,7 @@ exports.seed = function(knex) {
           password: encryptPassword('admin'),
           access_level: 'admin',
           created_at: new Date().toISOString().substr(0, 10),
-          token: generateUniqueToken()
+          token: generateToken()
         },
       ]);
     });
