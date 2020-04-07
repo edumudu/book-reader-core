@@ -1,59 +1,61 @@
-const generateUniqueToken = require('../utils/generateUniqueToken');
+const generateToken = require('../utils/generateToken');
 const encryptPassword = require('../utils/encryptPassword');
 const connection = require('../database/connection');
 const { errors } = require('../variables/controller');
 
 const table = 'tb_users';
 
-async function verifyUserToken(id, token) {
-  const user = await connection(table)
-    .where('id', id)
-    .select('token')
-    .first();
-
-  return user.token === token;
-}
-
 module.exports = {
+  async get (request, response) {
+
+    const user = await connection(table).where({ id: request.userId }).select().first();
+    delete user.password;
+
+    if (user)
+      return response.status(200).json(user);
+    else 
+      return response.status(404).send();
+  },
+
   async create(request, response) {
-    const { username, email, password } = request.body;
+    const { username, email, password, access_level } = request.body;
 
     const date = new Date().toISOString().substr(0, 10);
 
-    const data = {
+    const user = {
       username,
       email,
       password: encryptPassword(password),
-      token: generateUniqueToken(),
-      access_level: 'admin',
+      access_level,
       created_at: date
     };
 
     try {
-      const [id] = await connection(table).insert(data);
+      const [id] = await connection(table).insert(user);
 
-      return response.status(201).json({ id, ...data });
+      return response.status(201).json({ 
+        user: { id, ...user },
+        token: generateToken({ id })
+      });
     } catch (error) {
       return response.status(400).json(errors.syntax('create'));
     }
   },
 
   async delete(request, response) {
-    const userToken = request.headers.authorization;
     const { id } = request.params;
 
-    if (!(await verifyUserToken(id, userToken)))
+    if (id !== request.userId)
       return response.status(401).json(errors.permition);
 
     await connection(table)
-      .where('id', id)
+      .where({ id: id })
       .delete()
     
     return response.status(204).send();
   },
 
   async update(request, response) {
-    const userToken = request.headers.authorization;
     const { id } = request.params;
     const newValues = request.body;
     
@@ -62,7 +64,7 @@ module.exports = {
     if (!user)
       return response.status(404).json(errors.notFound);
 
-    if(!(await verifyUserToken(id, userToken)))
+    if(id !== request.userId)
       return response.status(401).json(errors.permition);
     
     try {

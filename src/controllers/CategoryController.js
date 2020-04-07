@@ -16,9 +16,8 @@ module.exports = {
 
   async create(request, response) {
     const { name } = request.body;
-    const userToken = request.headers.authorization;
 
-    if(!await verifyAuthorization(userToken))
+    if(!await verifyAuthorization(request.userId))
       return response.status(401).json(errors.permition);
 
     const data = {
@@ -36,11 +35,10 @@ module.exports = {
   },
 
   async update(request, response) {
-    const userToken = request.headers.authorization;
     const { name } = request.body;
     const { id } = request.params;
 
-    if (!await verifyAuthorization(userToken))
+    if (!await verifyAuthorization(request.userId))
       return response.status(401).json(errors.permition);
 
     try {
@@ -56,9 +54,8 @@ module.exports = {
 
   async delete(request, response) {
     const { id } = request.params;
-    const userToken = request.headers.authorization;
 
-    if (!await verifyAuthorization(userToken))
+    if (!await verifyAuthorization(request.userId))
       return response.status(401).json(errors.permition);
 
     try {
