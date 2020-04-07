@@ -2,11 +2,11 @@ const { authorized_level } = require('../variables/controller');
 const connection = require('../database/connection');
 
 module.exports = async function verifyAuthorization(
-  token,
+  id,
   authorized_levels = authorized_level
 ) {
   const user = await connection('tb_users')
-    .where({ token })
+    .where({ id })
     .select('access_level')
     .first() || {};
 
