@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import authConfig from '../config/auth.json';
 
 export default (req: Request, res: Response, next: NextFunction): Response | void => {
   const authToken = req.headers.authorization;
@@ -21,10 +20,10 @@ export default (req: Request, res: Response, next: NextFunction): Response | voi
     return res.status(401).json({ error: 'Token Malformated' });
   }
 
-  jwt.verify(token, authConfig.secret, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err || !decoded) return res.status(401).json({ error: 'Token invalid' });
 
-    req.headers.userId = decoded.id;
+    req.headers.userId = (<{ id: string }>decoded).id;
 
     return next();
   });

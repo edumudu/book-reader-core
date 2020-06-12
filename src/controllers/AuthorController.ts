@@ -8,15 +8,12 @@ export default {
   async create(req: Request, res: Response): Promise<Response> {
     const { name } = req.body;
 
-    const author = {
-      name,
-      created_at: new Date().toISOString().substr(0, 10),
-    };
+    const author = { name };
 
     try {
       await connection(table).insert(author);
 
-      return res.json(author);
+      return res.status(201).json(author);
     } catch (err) {
       return res.status(400).json(errors.syntax('create'));
     }

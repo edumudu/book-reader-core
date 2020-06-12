@@ -12,8 +12,6 @@ export default {
   async create(req: Request, res: Response): Promise<Response> {
     const capter = req.body;
 
-    capter.created_at = new Date().toISOString().substr(0, 10);
-
     const [id] = await connection(table).insert(capter);
 
     return res.status(201).json({ id, ...capter });

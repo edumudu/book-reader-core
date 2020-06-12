@@ -1,12 +1,14 @@
 import Knex, { SchemaBuilder } from 'knex';
 
-export const up = (knex: Knex): SchemaBuilder => {
+export function up(knex: Knex): SchemaBuilder {
   return knex.schema.createTable('tb_authors', table => {
     table.increments();
     table.string('name').notNullable();
 
     table.timestamps(true, true);
   });
-};
+}
 
-export const down = (knex: Knex): SchemaBuilder => knex.schema.dropTable('tb_authors');
+export function down(knex: Knex): SchemaBuilder {
+  return knex.schema.dropTable('tb_authors');
+}

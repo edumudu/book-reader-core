@@ -1,8 +1,5 @@
-import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 export default function encryptPassword(pass: string): string {
-  const mykey = crypto.createCipher('aes-128-cbc', 'mypassword');
-  const myStr = mykey.update(pass, 'utf8', 'hex');
-
-  return myStr + mykey.final('hex');
+  return bcrypt.hashSync(pass, 10);
 }

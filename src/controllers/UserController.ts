@@ -18,14 +18,11 @@ export default {
   async create(request: Request, response: Response): Promise<Response> {
     const { username, email, password, access_level } = request.body;
 
-    const date = new Date().toISOString().substr(0, 10);
-
     const user = {
       username,
       email,
       password: encryptPassword(password),
       access_level,
-      created_at: date,
     };
 
     try {

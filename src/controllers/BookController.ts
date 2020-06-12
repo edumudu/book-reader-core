@@ -47,7 +47,6 @@ export default {
         posted_by: request.headers.userId,
         type,
         is_visible,
-        created_at: new Date().toISOString().substr(0, 10),
       };
 
       const dir = books_dir + name.replace(/( )/g, '-');

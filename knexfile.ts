@@ -4,10 +4,10 @@ const obj: Obj = {
   development: {
     client: 'mysql',
     connection: {
-      host: '127.0.0.1',
-      database: 'book_read',
-      user: 'root',
-      password: 'password',
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
       dateStrings: true,
     },
     migrations: {
@@ -21,10 +21,10 @@ const obj: Obj = {
   test: {
     client: 'mysql',
     connection: {
-      host: '127.0.0.1',
+      host: process.env.DB_HOST,
       database: 'book_read_test',
-      user: 'root',
-      password: 'password',
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
       dateStrings: true,
     },
     migrations: {

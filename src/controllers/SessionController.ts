@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import connection from '../database/connection';
-import encryptPassword from '../utils/encryptPassword';
 import generateToken from '../utils/generateToken';
 import { errors } from '../variables/controller';
 
@@ -12,10 +12,10 @@ export default {
 
     const user = await connection(table).where({ email }).select().first();
 
-    if (!user) return response.status(400).json(errors.notFound);
+    if (!user) return response.status(404).json(errors.notFound);
 
-    if (user.password !== encryptPassword(password)) {
-      return response.status(400).json({ error: 'Invalid password' });
+    if (bcrypt.compareSync(password, user.password)) {
+      return response.status(403).json({ error: 'Invalid password' });
     }
 
     return response.json({ token: generateToken({ id: user.id }) });

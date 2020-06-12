@@ -22,10 +22,7 @@ export default {
       return response.status(401).json(errors.permition);
     }
 
-    const data = {
-      name,
-      created_at: new Date().toISOString().substr(0, 10),
-    };
+    const data = { name };
 
     try {
       const [id] = await connection(table).insert(data);

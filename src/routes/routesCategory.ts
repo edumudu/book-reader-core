@@ -6,9 +6,9 @@ const routes = express.Router();
 
 import CategoryController from '../controllers/CategoryController';
 
-routes.use(authMiddleware);
-
 routes.get('/', CategoryController.index);
+
+routes.use(authMiddleware);
 
 routes.post(
   '/',

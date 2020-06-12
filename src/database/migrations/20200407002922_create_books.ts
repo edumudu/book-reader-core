@@ -1,6 +1,6 @@
 import Knex, { SchemaBuilder } from 'knex';
 
-export const up = (knex: Knex): SchemaBuilder => {
+export function up(knex: Knex): SchemaBuilder {
   return knex.schema.createTable('tb_books', table => {
     table.increments();
     table.string('name').notNullable();
@@ -17,6 +17,8 @@ export const up = (knex: Knex): SchemaBuilder => {
     table.foreign('author_id').references('id').inTable('tb_authors').onUpdate('CASCADE').onDelete('CASCADE');
     table.foreign('artist_id').references('id').inTable('tb_artists').onUpdate('CASCADE').onDelete('CASCADE');
   });
-};
+}
 
-export const down = (knex: Knex): SchemaBuilder => knex.schema.dropTable('tb_books');
+export function down(knex: Knex): SchemaBuilder {
+  return knex.schema.dropTable('tb_books');
+}

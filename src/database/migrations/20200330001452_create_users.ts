@@ -1,6 +1,6 @@
 import Knex, { SchemaBuilder } from 'knex';
 
-export const up = (knex: Knex): SchemaBuilder => {
+export function up(knex: Knex): SchemaBuilder {
   return knex.schema.createTable('tb_users', table => {
     table.increments();
     table.string('username').notNullable();
@@ -10,6 +10,8 @@ export const up = (knex: Knex): SchemaBuilder => {
 
     table.timestamps(true, true);
   });
-};
+}
 
-export const down = (knex: Knex): SchemaBuilder => knex.schema.dropTable('tb_users');
+export function down(knex: Knex): SchemaBuilder {
+  return knex.schema.dropTable('tb_users');
+}
