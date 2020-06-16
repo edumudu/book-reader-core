@@ -1,4 +1,5 @@
-import { Obj } from './src/ts/types';
+import { Obj } from './src/@types/types';
+import 'dotenv/config';
 
 const obj: Obj = {
   development: {
@@ -16,6 +17,7 @@ const obj: Obj = {
     seeds: {
       directory: './src/database/seeds/dev',
     },
+    pool: { min: 0, max: 7 },
   },
 
   test: {
@@ -33,6 +35,7 @@ const obj: Obj = {
     seeds: {
       directory: './src/database/seeds/tests',
     },
+    pool: { min: 0, max: 7 },
   },
 
   staging: {

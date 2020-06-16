@@ -1,7 +1,7 @@
 import Knex, { SchemaBuilder } from 'knex';
 
 export function up(knex: Knex): SchemaBuilder {
-  return knex.schema.createTable('tb_artists', table => {
+  return knex.schema.createTable('artists', table => {
     table.increments();
     table.string('name').notNullable();
 
@@ -10,5 +10,5 @@ export function up(knex: Knex): SchemaBuilder {
 }
 
 export function down(knex: Knex): SchemaBuilder {
-  return knex.schema.dropTable('tb_artists');
+  return knex.schema.dropTable('artists');
 }

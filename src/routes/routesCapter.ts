@@ -20,7 +20,6 @@ routes.post(
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string(),
       book_id: Joi.number().required(),
-      posted_by: Joi.number().required(),
     }),
   }),
   CaptuloController.create,

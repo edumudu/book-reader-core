@@ -17,16 +17,17 @@ import { connected } from 'process';
 //   return await request(app).post('/category').set('authorization', user.token).send(categoryData);
 // }
 
-beforeAll(async () => {
-  await connection.migrate.latest();
-}, 30000);
-
-afterAll(async () => {
-  await connection.migrate.rollback();
-  await connection.destroy();
-}, 30000);
-
 describe('Category', () => {
+  // beforeAll(async () => {
+  //   await connection.migrate.latest();
+  // }, 30000);
+
+  // afterAll(async done => {
+  //   await connection.migrate.rollback();
+  //   await connection.destroy();
+  //   done();
+  // });
+
   it('Should list all categorys', async () => {
     // await connection.seed.run({ specific: 'seed_category.js' });
 

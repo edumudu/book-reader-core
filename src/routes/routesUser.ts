@@ -21,7 +21,7 @@ routes.post(
 
 routes.use(authMiddleware);
 
-routes.get('/', UserController.get);
+routes.get('/', UserController.me);
 
 routes.put(
   '/:id',

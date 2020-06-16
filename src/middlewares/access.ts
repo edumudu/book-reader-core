@@ -1,14 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import connection from '../database/connection';
+import User from '../models/User';
 
 export default async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
-    const { access_level } = await connection('tb_users')
-      .where({ id: req.headers.userId })
-      .select('access_level')
-      .first();
+    const user = (await User.findById(req.headers.userId)).toJSON();
 
-    if ('admin' !== access_level) {
+    if ('admin' !== user.access_level) {
       return res.status(401).json({ error: 'Access level insufient.' });
     }
 

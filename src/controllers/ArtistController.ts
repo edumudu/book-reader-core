@@ -1,17 +1,13 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
+import Artist from '../models/Artist';
 import { errors } from '../variables/controller';
-
-const table = 'tb_artists';
 
 export default {
   async create(req: Request, res: Response): Promise<Response> {
     const { name } = req.body;
 
-    const artist = { name };
-
     try {
-      await connection(table).insert(artist);
+      const artist = await Artist.create({ name });
 
       return res.status(201).json(artist);
     } catch (err) {

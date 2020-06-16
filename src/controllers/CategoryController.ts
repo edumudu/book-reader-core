@@ -1,14 +1,12 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
+import Category from '../models/Category';
 import { errors } from '../variables/controller';
 import verifyAuthorization from '../utils/verifyAuthorization';
 
-const table = 'tb_category';
-
 export default {
   async index(request: Request, response: Response): Promise<Response> {
-    const count = await connection(table).count('id');
-    const categorys = await connection(table).select('*');
+    const count = await Category.count('id');
+    const categorys = await Category.findAll();
 
     response.header('x-total-count', String(count));
 
@@ -22,12 +20,10 @@ export default {
       return response.status(401).json(errors.permition);
     }
 
-    const data = { name };
-
     try {
-      const [id] = await connection(table).insert(data);
+      const category = await Category.create({ name });
 
-      return response.status(201).json({ id, ...data });
+      return response.status(201).json(category);
     } catch (err) {
       return response.status(400).json(errors.syntax('create'));
     }
@@ -42,9 +38,9 @@ export default {
     }
 
     try {
-      await connection(table).where('id', id).update({ name });
+      const category = await Category.update({ name }, { id });
 
-      return response.status(204).send();
+      return response.json(category);
     } catch (err) {
       return response.status(400).send(errors.syntax('update'));
     }
@@ -58,7 +54,7 @@ export default {
     }
 
     try {
-      await connection(table).where({ id }).delete();
+      await Category.destroy({ id });
 
       return response.status(204).send();
     } catch (err) {

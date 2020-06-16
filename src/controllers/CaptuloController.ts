@@ -1,24 +1,26 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
-const table = 'tb_captulos';
+import Chapter from '../models/Chapter';
+import { errors } from '../variables/controller';
 
 export default {
   async index(req: Request, res: Response): Promise<Response> {
-    const capters = await connection(table).select('*');
+    const capters = await Chapter.findAll();
 
     return res.json(capters);
   },
 
   async create(req: Request, res: Response): Promise<Response> {
-    const capter = req.body;
+    const { book_id } = req.body;
+    const chapter = new Chapter({});
 
-    const [id] = await connection(table).insert(capter);
+    chapter.set({ user_id: req.headers.userId, book_id });
+    chapter.save();
 
-    return res.status(201).json({ id, ...capter });
+    return res.status(201).json(chapter);
   },
 
   async delete(req: Request, res: Response): Promise<Response> {
-    await connection(table).where({ id: req.headers.userId }).delete();
+    await new Chapter({ id: req.headers.userId }).destroy();
 
     return res.status(204).send();
   },
@@ -27,9 +29,17 @@ export default {
     const { id } = req.params;
     const newValues = req.body;
 
-    await connection(table).where({ id }).update(newValues);
-    const capter = await connection(table).where({ id }).select('*').first();
+    try {
+      const chapter = await Chapter.update(newValues, { id });
 
-    return res.json(capter);
+      return res.json(chapter);
+    } catch (e) {
+      switch (e.message) {
+        case 'EmptyResponse':
+          return res.status(404).json(errors.notFound);
+        default:
+          return res.status(400).json(errors.syntax('update'));
+      }
+    }
   },
 };

@@ -1,7 +1,7 @@
 import Knex, { SchemaBuilder } from 'knex';
 
 export function up(knex: Knex): SchemaBuilder {
-  return knex.schema.createTable('tb_users', table => {
+  return knex.schema.createTable('users', table => {
     table.increments();
     table.string('username').notNullable();
     table.string('email').notNullable();
@@ -13,5 +13,5 @@ export function up(knex: Knex): SchemaBuilder {
 }
 
 export function down(knex: Knex): SchemaBuilder {
-  return knex.schema.dropTable('tb_users');
+  return knex.schema.dropTable('users');
 }

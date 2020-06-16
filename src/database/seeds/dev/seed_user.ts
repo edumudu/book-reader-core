@@ -2,10 +2,10 @@ import Knex from 'knex';
 import encryptPassword from '../../../utils/encryptPassword';
 
 export const seed = async (knex: Knex): Promise<number[]> =>
-  await knex('tb_users')
+  await knex('users')
     .del()
     .then(() =>
-      knex('tb_users').insert([
+      knex('users').insert([
         {
           username: 'edumudu',
           email: 'eduardomudutiu@gmail.com',
