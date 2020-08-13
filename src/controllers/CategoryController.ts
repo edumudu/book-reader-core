@@ -1,71 +1,52 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
+import Category from '../entity/category';
 import { errors } from '../variables/controller';
-import verifyAuthorization from '../utils/verifyAuthorization';
 
-const table = 'tb_category';
-
-export default {
-  async index(request: Request, response: Response): Promise<Response> {
-    const count = await connection(table).count('id');
-    const categorys = await connection(table).select('*');
+export default class CategoryController {
+  public static async index(request: Request, response: Response): Promise<Response> {
+    const count = await Category.count();
+    const categorys = await Category.find();
 
     response.header('x-total-count', String(count));
 
     return response.status(200).json(categorys);
-  },
+  }
 
-  async create(request: Request, response: Response): Promise<Response> {
+  public static async create(request: Request, response: Response): Promise<Response> {
     const { name } = request.body;
 
-    if (!(await verifyAuthorization(Number(request.headers.userId)))) {
-      return response.status(401).json(errors.permition);
-    }
-
-    const data = {
-      name,
-      created_at: new Date().toISOString().substr(0, 10),
-    };
-
     try {
-      const [id] = await connection(table).insert(data);
+      const category = Category.create({ name });
+      await category.save();
 
-      return response.status(201).json({ id, ...data });
+      return response.status(201).json(category);
     } catch (err) {
       return response.status(400).json(errors.syntax('create'));
     }
-  },
+  }
 
-  async update(request: Request, response: Response): Promise<Response> {
+  public static async update(request: Request, response: Response): Promise<Response> {
     const { name } = request.body;
     const { id } = request.params;
 
-    if (!(await verifyAuthorization(Number(request.headers.userId)))) {
-      return response.status(401).json(errors.permition);
-    }
-
     try {
-      await connection(table).where('id', id).update({ name });
+      await Category.update({ id: +id }, { name });
 
-      return response.status(204).send();
+      return response.json(await Category.findOne({ id: +id }));
     } catch (err) {
       return response.status(400).send(errors.syntax('update'));
     }
-  },
+  }
 
-  async delete(request: Request, response: Response): Promise<Response> {
+  public static async delete(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
-    if (!(await verifyAuthorization(Number(request.headers.userId)))) {
-      return response.status(401).json(errors.permition);
-    }
-
     try {
-      await connection(table).where({ id }).delete();
+      await Category.delete({ id: +id });
 
       return response.status(204).send();
     } catch (err) {
       return response.status(400).json(errors.syntax('delete'));
     }
-  },
-};
+  }
+}

@@ -13,7 +13,7 @@ routes.post(
       username: Joi.string().required(),
       email: Joi.string().email().required(),
       password: Joi.string().required(),
-      access_level: Joi.string(),
+      role: Joi.string(),
     }),
   }),
   UserController.create,
@@ -21,7 +21,7 @@ routes.post(
 
 routes.use(authMiddleware);
 
-routes.get('/', UserController.get);
+routes.get('/', UserController.me);
 
 routes.put(
   '/:id',
@@ -33,7 +33,7 @@ routes.put(
     [Segments.BODY]: Joi.object().keys({
       username: Joi.string(),
       password: Joi.string(),
-      access_level: Joi.string(),
+      role: Joi.string(),
     }),
   }),
   UserController.update,

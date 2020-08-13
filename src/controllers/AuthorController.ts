@@ -1,24 +1,22 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
+import Author from '../entity/author';
 import { errors } from '../variables/controller';
 
-const table = 'tb_authors';
+export default class AuthorController {
+  public static async idnex(req: Request, res: Response): Promise<Response> {
+    return res.json(await Author.find());
+  }
 
-export default {
-  async create(req: Request, res: Response): Promise<Response> {
+  public static async create(req: Request, res: Response): Promise<Response> {
     const { name } = req.body;
 
-    const author = {
-      name,
-      created_at: new Date().toISOString().substr(0, 10),
-    };
-
     try {
-      await connection(table).insert(author);
+      const author = Author.create({ name });
+      await author.save();
 
-      return res.json(author);
+      return res.status(201).json(author);
     } catch (err) {
       return res.status(400).json(errors.syntax('create'));
     }
-  },
-};
+  }
+}

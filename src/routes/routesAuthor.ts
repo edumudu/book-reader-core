@@ -8,6 +8,8 @@ const routes = express.Router();
 
 import AuthorController from '../controllers/AuthorController';
 
+routes.get('/', AuthorController.idnex);
+
 routes.use(authMiddleware);
 routes.use(accessMiddleware);
 

@@ -1,27 +1,28 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
-import encryptPassword from '../utils/encryptPassword';
+import bcrypt from 'bcrypt';
+import User from '../entity/user';
 import generateToken from '../utils/generateToken';
 import { errors } from '../variables/controller';
 
-const table = 'tb_users';
+export default class AuthController {
+  public static async create(req: Request, res: Response): Promise<Response> {
+    const { email, password } = req.body;
+    let user;
 
-export default {
-  async create(request: Request, response: Response): Promise<Response> {
-    const { email, password } = request.body;
-
-    const user = await connection(table).where({ email }).select().first();
-
-    if (!user) return response.status(400).json(errors.notFound);
-
-    if (user.password !== encryptPassword(password)) {
-      return response.status(400).json({ error: 'Invalid password' });
+    try {
+      user = await User.findOneOrFail({ email });
+    } catch (error) {
+      return res.status(404).json(errors.notFound);
     }
 
-    return response.json({ token: generateToken({ id: user.id }) });
-  },
+    if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(403).json({ error: 'Invalid password' });
+    }
 
-  async delete(request: Request, response: Response): Promise<Response> {
-    return response.send();
-  },
-};
+    return res.json({ token: generateToken({ id: user.id }) });
+  }
+
+  public static async delete(req: Request, res: Response): Promise<Response> {
+    return res.send();
+  }
+}

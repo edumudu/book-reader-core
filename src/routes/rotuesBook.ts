@@ -26,6 +26,9 @@ routes.use(accessMiddleware);
 routes.post(
   '/',
   celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+      like: Joi.string(),
+    }),
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string().required(),
       sinopse: Joi.string().required(),
@@ -33,7 +36,7 @@ routes.post(
       author_id: Joi.number().required(),
       artist_id: Joi.number().required(),
       is_visible: Joi.bool().required(),
-      categorys: Joi.array().required(),
+      categories: Joi.array().required(),
     }),
   }),
   BookController.create,
@@ -62,7 +65,7 @@ routes.put(
       posted_by: Joi.number(),
       type: Joi.string(),
       is_visible: Joi.bool(),
-      categorys: Joi.array(),
+      categories: Joi.array(),
     }),
   }),
   BookController.update,

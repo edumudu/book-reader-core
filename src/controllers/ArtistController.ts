@@ -1,24 +1,22 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
+import Artist from '../entity/artist';
 import { errors } from '../variables/controller';
 
-const table = 'tb_artists';
+export default class ArtistController {
+  public static async index(req: Request, res: Response): Promise<Response> {
+    return res.json(await Artist.find());
+  }
 
-export default {
-  async create(req: Request, res: Response): Promise<Response> {
+  public static async create(req: Request, res: Response): Promise<Response> {
     const { name } = req.body;
 
-    const artist = {
-      name,
-      created_at: new Date().toISOString().substr(0, 10),
-    };
-
     try {
-      await connection(table).insert(artist);
+      const artist = Artist.create({ name });
+      await artist.save();
 
-      return res.json(artist);
+      return res.status(201).json(artist);
     } catch (err) {
       return res.status(400).json(errors.syntax('create'));
     }
-  },
-};
+  }
+}
