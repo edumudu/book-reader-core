@@ -1,97 +1,96 @@
 import { Request, Response } from 'express';
-import connection from '../database/connection';
-import Book from '../models/Book';
-import User from '../models/User';
-import Artist from '../models/Artist';
-import Author from '../models/Author';
+import Book from '../entity/book';
+import User from '../entity/user';
+import Artist from '../entity/artist';
+import Author from '../entity/author';
+import Category from '../entity/category';
 import { errors } from '../variables/controller';
 import fs from 'fs';
 
-const table = 'tb_books';
 const books_dir = process.cwd() + '/assets/books/';
 
-export default {
-  async index(request: Request, response: Response): Promise<Response> {
-    // const books = await connection('book_category')
-    //   .innerJoin(table, 'book_category.book_id', `${table}.id`)
-    //   .innerJoin('tb_category', 'book_category.category_id', 'tb_category.id')
-    //   .groupBy(`${table}.id`)
-    //   .select('tb_books.*', connection.raw('group_concat(tb_category.name) as categorys'));
+export default class BookController {
+  public static async index(request: Request, response: Response): Promise<Response> {
+    const { like: likeFilter } = request.query;
+    let books;
 
-    const books = await Book.findAll({}, { withRelated: 'categories' });
+    if (likeFilter) {
+      books = await Book.createQueryBuilder()
+        .where('name LIKE :name', { name: `%${likeFilter}%` })
+        .getMany();
+    } else {
+      books = await Book.find();
+    }
 
     return response.status(200).json(books);
-  },
+  }
 
-  async show(request: Request, response: Response): Promise<Response> {
+  public static async show(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
     try {
-      const book = await Book.findById(id, { withRelated: ['categories'] });
+      const book = await Book.findOneOrFail(id);
 
       return response.send(book);
     } catch (e) {
-      return response.status(404).json(errors.notFound);
+      return response.status(404).json(e);
     }
-  },
+  }
 
-  async create(request: Request, response: Response): Promise<Response> {
+  public static async create(request: Request, response: Response): Promise<Response> {
     const { name, sinopse, type, is_visible, categories, artist_id, author_id } = request.body;
 
     try {
-      const user = await User.findById(request.headers.userId);
-      const author = await Author.findById(author_id);
-      const artist = await Artist.findById(artist_id);
+      const author = await Author.findOneOrFail(author_id);
+      const artist = await Artist.findOneOrFail(artist_id);
 
-      const book = new Book({
-        name,
-        sinopse,
-        type,
-        is_visible,
-      });
+      const book = new Book();
+      book.name = name;
+      book.sinopse = sinopse;
+      book.type = type;
+      book.is_visible = is_visible;
+      book.author = author;
+      book.artist = artist;
+      book.categories = categories;
+      await book.save();
 
       const dir = books_dir + name.replace(/( )/g, '-');
       fs.mkdirSync(dir, { recursive: true });
       // fs.writeFile(dir)
 
-      book.set({ artist_id, author_id, user_id: user.get('id') });
-      await book.save();
-      await book.related('categories').attach(categories);
-      await book.load('categories');
-
       return response.status(201).json(book);
-    } catch (err) {
+    } catch (e) {
       return response.status(400).json(errors.syntax('create'));
     }
-  },
+  }
 
-  async delete(request: Request, response: Response): Promise<Response> {
+  public static async delete(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
     try {
-      const book = await Book.findById(id);
-      const dir = books_dir + book.get('name').replace(/( )/g, '-');
+      const book = await Book.findOneOrFail(id);
+      const dir = books_dir + book.name.replace(/( )/g, '-');
       fs.rmdirSync(dir);
 
-      await book.destroy();
+      await book.remove();
 
       return response.status(204).send();
     } catch (err) {
       return response.status(400).json(errors.syntax('delete'));
     }
-  },
+  }
 
-  async update(request: Request, response: Response): Promise<Response> {
+  public static async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
     const data = request.body;
 
     try {
-      await connection(table).where({ id }).update(data);
-      const book = await connection(table).where({ id }).select('*').first();
+      const book = await Book.findOneOrFail(id);
+      book.save(data);
 
       return response.status(200).json(book);
     } catch (err) {
       return response.status(400).json(errors.syntax('update'));
     }
-  },
-};
+  }
+}

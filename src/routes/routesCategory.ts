@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
 import { celebrate, Segments, Joi } from 'celebrate';
 import authMiddleware from '../middlewares/auth';
+import accessMiddleware from '../middlewares/access';
 
 const routes = express.Router();
 
@@ -9,6 +10,7 @@ import CategoryController from '../controllers/CategoryController';
 routes.get('/', CategoryController.index);
 
 routes.use(authMiddleware);
+routes.use(accessMiddleware);
 
 routes.post(
   '/',

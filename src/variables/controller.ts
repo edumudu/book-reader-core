@@ -4,6 +4,9 @@ export const errors = {
   },
   permition: { error: 'Operation not permitted.' },
   notFound: { error: 'User not found' },
+  crud: {
+    ER_DUP_ENTRY: 'Already existis',
+  },
 };
 
 export const authorized_level = ['admin', 'mod'];

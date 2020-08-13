@@ -1,12 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/User';
+import User from '../entity/user';
+import { authorized_level } from '../variables/controller';
 
 export default async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  try {
-    const user = (await User.findById(req.headers.userId)).toJSON();
+  const id = +(req.headers.userId || -1);
 
-    if ('admin' !== user.access_level) {
-      return res.status(401).json({ error: 'Access level insufient.' });
+  try {
+    const user = await User.findOneOrFail(id);
+
+    if (!authorized_level.includes(user.role)) {
+      return res.status(403).json({ error: 'Access level insufient.' });
     }
 
     return next();

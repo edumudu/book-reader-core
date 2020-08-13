@@ -2,29 +2,30 @@ import { Request, Response } from 'express';
 import generateToken from '../utils/generateToken';
 import encryptPassword from '../utils/encryptPassword';
 import { errors } from '../variables/controller';
-import User from '../models/User';
+import User from '../entity/user';
 
-export default {
-  async me(request: Request, response: Response): Promise<Response> {
-    const user = await User.findOne({ id: request.headers.userId });
+export default class UserController {
+  public static async me(request: Request, response: Response): Promise<Response> {
+    const user = await User.findOneOrFail(+(request.headers.userId || -1));
     // delete user.password;
 
     if (user) return response.status(200).json(user);
     else return response.status(404).send();
-  },
+  }
 
-  async create(request: Request, response: Response): Promise<Response> {
-    const { username, email, password, access_level } = request.body;
+  public static async create(request: Request, response: Response): Promise<Response> {
+    const { username, email, password, role } = request.body;
 
     const userData = {
       username,
       email,
       password: encryptPassword(password),
-      access_level,
+      role,
     };
 
     try {
-      const user = await User.create(userData);
+      const user = User.create(userData);
+      await user.save();
 
       return response.status(201).json({
         user: user,
@@ -33,35 +34,37 @@ export default {
     } catch (error) {
       return response.status(400).json(errors.syntax('create'));
     }
-  },
+  }
 
-  async delete(request: Request, response: Response): Promise<Response> {
+  public static async delete(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
     if (id !== request.headers.userId) {
       return response.status(401).json(errors.permition);
     }
 
-    await User.destroy({ id });
+    (await User.findOneOrFail(id)).remove();
 
     return response.status(204).send();
-  },
+  }
 
-  async update(request: Request, response: Response): Promise<Response> {
+  public static async update(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
-    const newValues = request.body;
+    const { username, password } = request.body;
 
-    let user = await User.findOne({ id: id });
+    const user = await User.findOneOrFail(id);
 
     if (!user) return response.status(404).json(errors.notFound);
     if (id !== request.headers.userId) return response.status(401).json(errors.permition);
 
     try {
-      user = await User.update({ ...newValues, password: encryptPassword(newValues.password) }, { id });
+      user.username = username;
+      user.password = encryptPassword(password);
+      await user.save();
 
       return response.status(200).send(user);
     } catch (err) {
       return response.status(400).json(errors.syntax('update'));
     }
-  },
-};
+  }
+}

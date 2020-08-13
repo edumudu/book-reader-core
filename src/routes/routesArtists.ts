@@ -8,6 +8,8 @@ const routes = express.Router();
 
 import ArtistController from '../controllers/ArtistController';
 
+routes.get('/', ArtistController.index);
+
 routes.use(authMiddleware);
 routes.use(accessMiddleware);
 

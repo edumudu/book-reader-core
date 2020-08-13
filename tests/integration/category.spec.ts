@@ -1,13 +1,12 @@
 import request from 'supertest';
 import app from '../../src/app';
 import jest from 'jest';
-import connection from '../../src/database/connection';
 import { connected } from 'process';
 
 // async function createCategory(data = {}) {
 //   await connection.seed.run({ specific: 'seed_user.js' });
 
-//   const user = await connection('tb_users').where('access_level', 'admin').select('*').first();
+//   const user = await connection('tb_users').where('role', 'admin').select('*').first();
 
 //   const categoryData = {
 //     name: 'fiction',
@@ -51,7 +50,7 @@ describe('Category', () => {
   //   const responseCategory = await createCategory();
   //   await connection.seed.run();
 
-  //   const user = await connection('tb_users').where('access_level', 'admin').select('*').first();
+  //   const user = await connection('tb_users').where('role', 'admin').select('*').first();
 
   //   const response = await request(app)
   //     .delete(`/category/${responseCategory.body.id}`)
@@ -65,7 +64,7 @@ describe('Category', () => {
   //   const responseCategory = await createCategory();
   //   await connection.seed.run();
 
-  //   const user = await connection('tb_users').where('access_level', 'admin').select('*').first();
+  //   const user = await connection('tb_users').where('role', 'admin').select('*').first();
 
   //   const response = await request(app)
   //     .put(`/category/${responseCategory.body.id}`)

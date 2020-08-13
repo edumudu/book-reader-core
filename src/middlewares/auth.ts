@@ -20,7 +20,7 @@ export default (req: Request, res: Response, next: NextFunction): Response | voi
     return res.status(401).json({ error: 'Token Malformated' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET as string, (err, decoded) => {
     if (err || !decoded) return res.status(401).json({ error: 'Token invalid' });
 
     req.headers.userId = (<{ id: string }>decoded).id;

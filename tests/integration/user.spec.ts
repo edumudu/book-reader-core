@@ -1,18 +1,17 @@
 import request from 'supertest';
 import app from '../../src/app';
-import connection from '../../src/database/connection';
 
-// async function createUser(userData: Record<string, string | number> = {}) {
-//   const data = {
-//     username: 'edumudu',
-//     email: 'eduardomudutiu@gmail.com',
-//     password: '123456',
-//     access_level: 'admin',
-//     ...userData,
-//   };
+async function createUser(userData: Record<string, string | number> = {}) {
+  const data = {
+    username: 'edumudu',
+    email: 'eduardomudutiu@gmail.com',
+    password: '123456',
+    role: 'admin',
+    ...userData,
+  };
 
-//   return await request(app).post('/user').send(data);
-// }
+  return await request(app).post('/user').send(data);
+}
 
 describe('USER', () => {
   // beforeAll(async () => await connection.migrate.latest(), 30000);
@@ -23,18 +22,18 @@ describe('USER', () => {
   // });
 
   it('Should be able to create a new user', async () => {
-    // const response = await createUser();
+    const response = await createUser();
 
-    // const date = new Date().toISOString().substr(0, 10);
+    const date = new Date().toISOString().substr(0, 10);
 
-    // expect(response.status).toBe(201);
+    expect(response.status).toBe(201);
     // expect(response.body).toHaveProperty('token');
     // expect(response.body).toHaveProperty('created_at');
-    // expect(response.body).toHaveProperty('access_level');
+    // expect(response.body).toHaveProperty('role');
     // expect(response.body.token).toHaveLength(8);
     // expect(response.body.created_at).toBe(date);
     // expect(typeof response.body.id).toBe('number');
-    expect('1').toBe('1');
+    // expect('1').toBe('1');
   });
 
   // it('Should be able delete user', async () => {

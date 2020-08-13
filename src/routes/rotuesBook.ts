@@ -26,6 +26,9 @@ routes.use(accessMiddleware);
 routes.post(
   '/',
   celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+      like: Joi.string(),
+    }),
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string().required(),
       sinopse: Joi.string().required(),
