@@ -1,52 +1,29 @@
 import express, { Router } from 'express';
 import { celebrate, Segments, Joi } from 'celebrate';
+
 import authMiddleware from '../middlewares/auth';
+import UserController from '../controllers/UserController';
 
 const routes = express.Router();
 
-import UserController from '../controllers/UserController';
+routes.use(authMiddleware);
 
-routes.post(
+routes.patch(
   '/',
   celebrate({
     [Segments.BODY]: Joi.object().keys({
-      username: Joi.string().required(),
-      email: Joi.string().email().required(),
-      password: Joi.string().required(),
-      role: Joi.string(),
-    }),
-  }),
-  UserController.create,
-);
-
-routes.use(authMiddleware);
-
-routes.get('/', UserController.me);
-
-routes.put(
-  '/:id',
-  celebrate({
-    [Segments.PARAMS]: Joi.object().keys({
-      id: Joi.number().required(),
-    }),
-
-    [Segments.BODY]: Joi.object().keys({
       username: Joi.string(),
       password: Joi.string(),
-      role: Joi.string(),
+      confirmPassword: Joi.string().when('password', {
+        is: Joi.exist(),
+        then: Joi.required(),
+        otherwise: Joi.string(),
+      }),
     }),
   }),
   UserController.update,
 );
 
-routes.delete(
-  '/:id',
-  celebrate({
-    [Segments.PARAMS]: Joi.object().keys({
-      id: Joi.number().required(),
-    }),
-  }),
-  UserController.delete,
-);
+routes.delete('/', UserController.delete);
 
 export default (app: Router): Router => app.use('/user', routes);
