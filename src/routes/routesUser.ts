@@ -1,8 +1,8 @@
 import express, { Router } from 'express';
 import { celebrate, Segments, Joi } from 'celebrate';
 
-import authMiddleware from '../middlewares/auth';
 import UserController from '../controllers/UserController';
+import { authMiddleware } from '../middlewares';
 
 const routes = express.Router();
 

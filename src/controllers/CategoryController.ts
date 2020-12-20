@@ -1,52 +1,70 @@
 import { Request, Response } from 'express';
-import Category from '../entity/category';
-import { errors } from '../variables/controller';
+import { Like } from 'typeorm';
+import Category from '../models/category';
 
 export default class CategoryController {
   public static async index(request: Request, response: Response): Promise<Response> {
-    const count = await Category.count();
-    const categorys = await Category.find();
+    const page = Number(request.query.page || 1);
+    const perPage = Number(request.query.perPage || 1);
+    const search = request.query.search || '';
 
-    response.header('x-total-count', String(count));
+    const [categories, categoriesCount] = await Category.findAndCount({
+      where: { name: Like(`%${search}%`) },
+      order: { name: 'ASC' },
+      take: perPage,
+      skip: page * perPage - perPage,
+    });
 
-    return response.status(200).json(categorys);
+    return response.status(200).json({
+      data: categories,
+      meta: {
+        perPage,
+        currentPage: page,
+        totalItems: categoriesCount,
+        totalPages: Math.ceil(categoriesCount / perPage),
+      },
+    });
   }
 
-  public static async create(request: Request, response: Response): Promise<Response> {
+  public static async store(request: Request, response: Response): Promise<Response> {
     const { name } = request.body;
 
     try {
       const category = Category.create({ name });
       await category.save();
 
-      return response.status(201).json(category);
+      return response.status(201).json({ data: category });
     } catch (err) {
-      return response.status(400).json(errors.syntax('create'));
+      return response.status(400).json({ message: 'Error while createing category' });
     }
   }
 
   public static async update(request: Request, response: Response): Promise<Response> {
     const { name } = request.body;
-    const { id } = request.params;
+    const id = Number(request.params.id);
 
     try {
-      await Category.update({ id: +id }, { name });
+      const category = await Category.findOneOrFail(id);
 
-      return response.json(await Category.findOne({ id: +id }));
+      category.name = name;
+      await Category.save(category);
+
+      return response.json({ data: category });
     } catch (err) {
-      return response.status(400).send(errors.syntax('update'));
+      return response.status(400).send({ message: 'Error while update category' });
     }
   }
 
   public static async delete(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+    const id = Number(request.params.id);
 
     try {
-      await Category.delete({ id: +id });
+      const category = await Category.findOneOrFail(id);
+      await category.remove();
 
-      return response.status(204).send();
+      return response.status(200).json({ data: category });
     } catch (err) {
-      return response.status(400).json(errors.syntax('delete'));
+      return response.status(400).json({ message: 'Error while removing category' });
     }
   }
 }
