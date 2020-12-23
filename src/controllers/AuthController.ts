@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import User from '../models/user';
-import usersView from '../views/usersView';
 
 export default class AuthController {
   public static async register(request: Request, response: Response): Promise<Response> {
@@ -21,7 +20,7 @@ export default class AuthController {
       await user.save();
 
       return response.status(201).json({
-        user: usersView.render(user),
+        user,
         token: AuthController.generateToken({ id: user.id }),
       });
     } catch (error) {
@@ -34,7 +33,10 @@ export default class AuthController {
     let user;
 
     try {
-      user = await User.findOneOrFail({ email });
+      user = await User.findOneOrFail(
+        { email },
+        { select: ['password', 'email', 'id', 'createdAt', 'updatedAt', 'username', 'role'] },
+      );
     } catch (error) {
       return res.status(404).json({ message: 'Not found user' });
     }
@@ -44,7 +46,7 @@ export default class AuthController {
     }
 
     return res.json({
-      user: usersView.render(user),
+      user,
       token: AuthController.generateToken({ id: user.id }),
     });
   }
@@ -52,9 +54,7 @@ export default class AuthController {
   public static async me(request: Request, response: Response): Promise<Response> {
     const user = await User.findOne(Number(response.locals.userId));
 
-    return user
-      ? response.json({ data: usersView.render(user) })
-      : response.status(404).send({ message: 'Not found user' });
+    return user ? response.json({ data: user }) : response.status(404).send({ message: 'Not found user' });
   }
 
   public static async delete(request: Request, response: Response): Promise<Response> {

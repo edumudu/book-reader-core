@@ -5,7 +5,7 @@ import Category from '../models/category';
 export default class CategoryController {
   public static async index(request: Request, response: Response): Promise<Response> {
     const page = Number(request.query.page || 1);
-    const perPage = Number(request.query.perPage || 1);
+    const perPage = Number(request.query.perPage || 15);
     const search = request.query.search || '';
 
     const [categories, categoriesCount] = await Category.findAndCount({

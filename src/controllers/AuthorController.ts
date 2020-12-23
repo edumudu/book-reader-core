@@ -6,7 +6,7 @@ import Author from '../models/author';
 export default class AuthorController {
   public static async index(req: Request, res: Response): Promise<Response> {
     const page = Number(req.query.page || 1);
-    const perPage = Number(req.query.perPage || 1);
+    const perPage = Number(req.query.perPage || 15);
     const search = req.query.search || '';
 
     const [authors, authorsCount] = await Author.findAndCount({

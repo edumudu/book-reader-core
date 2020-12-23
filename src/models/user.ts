@@ -1,13 +1,14 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 
 import BaseModel from './baseModel';
+import Organization from './organization';
 
 @Entity({ name: 'users' })
 class User extends BaseModel {
   @Column({ unique: true })
   email!: string;
 
-  @Column()
+  @Column({ select: false })
   password!: string;
 
   @Column({ unique: true })
@@ -15,6 +16,9 @@ class User extends BaseModel {
 
   @Column()
   role!: 'admin' | 'mod' | 'user';
+
+  @OneToMany(type => Organization, organization => organization.user)
+  organizations!: Organization[];
 }
 
 export default User;

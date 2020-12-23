@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 
 import User from '../models/user';
-import usersView from '../views/usersView';
 
 export default class UserController {
   public static async delete(request: Request, response: Response): Promise<Response> {
@@ -20,7 +19,9 @@ export default class UserController {
   public static async update(request: Request, response: Response): Promise<Response> {
     const { username, password } = request.body;
 
-    const user = await User.findOne(response.locals.userId);
+    const user = await User.findOne(response.locals.userId, {
+      select: ['password', 'email', 'id', 'createdAt', 'updatedAt', 'username', 'role'],
+    });
 
     if (!user) return response.status(404).json({ message: 'Not found user' });
 
@@ -29,9 +30,7 @@ export default class UserController {
       user.password = password ? bcrypt.hashSync(password, 12) : user.password;
       await user.save();
 
-      return response.status(200).send({
-        user: usersView.render(user),
-      });
+      return response.status(200).send({ user });
     } catch (err) {
       return response.status(400).json({ message: 'Error when updating user data' });
     }
