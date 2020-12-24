@@ -1,96 +1,76 @@
 import { Request, Response } from 'express';
-import Book from '../entity/book';
-import User from '../entity/user';
-import Artist from '../entity/artist';
-import Author from '../entity/author';
-import Category from '../entity/category';
-import { errors } from '../variables/controller';
-import fs from 'fs';
+import { Like } from 'typeorm';
 
-const books_dir = process.cwd() + '/assets/books/';
+import Book from '../models/book';
 
 export default class BookController {
-  public static async index(request: Request, response: Response): Promise<Response> {
-    const { like: likeFilter } = request.query;
-    let books;
+  public static async index(req: Request, res: Response): Promise<Response> {
+    const page = Number(req.query.page || 1);
+    const perPage = Number(req.query.perPage || 15);
+    const search = req.query.search || '';
 
-    if (likeFilter) {
-      books = await Book.createQueryBuilder()
-        .where('name LIKE :name', { name: `%${likeFilter}%` })
-        .getMany();
-    } else {
-      books = await Book.find();
-    }
+    const [books, booksCount] = await Book.findAndCount({
+      where: { title: Like(`%${search}%`) },
+      order: { title: 'ASC' },
+      take: perPage,
+      skip: page * perPage - perPage,
+    });
 
-    return response.status(200).json(books);
+    return res.json({
+      data: books,
+      meta: {
+        perPage,
+        currentPage: page,
+        totalItems: booksCount,
+        totalPages: Math.ceil(booksCount / perPage),
+      },
+    });
   }
 
-  public static async show(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+  public static async store(req: Request, res: Response): Promise<Response> {
+    const { title, description, type } = req.body as Pick<Book, 'title' | 'description' | 'type'>;
 
     try {
-      const book = await Book.findOneOrFail(id);
+      const book = Book.create({ title, description, type });
 
-      return response.send(book);
-    } catch (e) {
-      return response.status(404).json(e);
-    }
-  }
-
-  public static async create(request: Request, response: Response): Promise<Response> {
-    const { name, sinopse, type, is_visible, categories, artist_id, author_id } = request.body;
-
-    try {
-      const author = await Author.findOneOrFail(author_id);
-      const artist = await Artist.findOneOrFail(artist_id);
-
-      const book = new Book();
-      book.name = name;
-      book.sinopse = sinopse;
-      book.type = type;
-      book.is_visible = is_visible;
-      book.author = author;
-      book.artist = artist;
-      book.categories = categories;
       await book.save();
 
-      const dir = books_dir + name.replace(/( )/g, '-');
-      fs.mkdirSync(dir, { recursive: true });
-      // fs.writeFile(dir)
-
-      return response.status(201).json(book);
-    } catch (e) {
-      return response.status(400).json(errors.syntax('create'));
+      return res.json({ data: book });
+    } catch (error) {
+      return res.status(400).json({ message: 'Erro while creating book' });
     }
   }
 
-  public static async delete(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
+  public static async update(req: Request, res: Response): Promise<Response> {
+    const id = Number(req.params.id);
+    const { title, description, type } = req.body as Pick<Book, 'title' | 'description' | 'type'>;
 
     try {
       const book = await Book.findOneOrFail(id);
-      const dir = books_dir + book.name.replace(/( )/g, '-');
-      fs.rmdirSync(dir);
+
+      book.title = title;
+      book.description = description;
+      book.type = type;
+
+      await book.save();
+
+      return res.json({ data: book });
+    } catch (error) {
+      return res.status(400).json({ message: 'Erro while updating book' });
+    }
+  }
+
+  public static async destroy(req: Request, res: Response): Promise<Response> {
+    const id = Number(req.params.id);
+
+    try {
+      const book = await Book.findOneOrFail(id);
 
       await book.remove();
 
-      return response.status(204).send();
-    } catch (err) {
-      return response.status(400).json(errors.syntax('delete'));
-    }
-  }
-
-  public static async update(request: Request, response: Response): Promise<Response> {
-    const { id } = request.params;
-    const data = request.body;
-
-    try {
-      const book = await Book.findOneOrFail(id);
-      book.save(data);
-
-      return response.status(200).json(book);
-    } catch (err) {
-      return response.status(400).json(errors.syntax('update'));
+      return res.json({ data: book });
+    } catch (error) {
+      return res.status(400).json({ message: 'Erro while destroyng book' });
     }
   }
 }
