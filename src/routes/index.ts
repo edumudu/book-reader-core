@@ -5,4 +5,4 @@ export { default as routesAuthor } from './routesAuthor';
 export { default as routesArtists } from './routesArtists';
 export { default as routesOrganizations } from './routesOrganizations';
 export { default as routesBook } from './routesBook';
-// export { default as routesChapter } from './routesChapter';
+export { default as routesChapter } from './routesChapter';

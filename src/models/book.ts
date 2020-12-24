@@ -1,4 +1,4 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 
 import BaseModel from './baseModel';
 import Category from './category';
@@ -16,6 +16,9 @@ class Book extends BaseModel {
 
   @Column()
   type!: 'novel' | 'manga';
+
+  @OneToMany(type => Chapter, chaper => chaper.book)
+  chapters!: Book[];
 }
 
 export default Book;
