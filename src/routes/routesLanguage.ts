@@ -1,10 +1,10 @@
-import express, { Router } from 'express';
-import { celebrate, Segments, Joi } from 'celebrate';
+import { Router } from 'express';
+import { celebrate, Joi, Segments } from 'celebrate';
 
-import ChapterController from '../controllers/ChapterController';
+import LanguageCOntroller from '../controllers/LanguageController';
 import { authMiddleware, moderationMiddleware } from '../middlewares';
 
-const routes = express.Router();
+const routes = Router();
 
 routes.get(
   '/',
@@ -14,25 +14,22 @@ routes.get(
       perPage: Joi.number().integer().min(1),
     }),
   }),
-  ChapterController.index,
+  LanguageCOntroller.index,
 );
 
 routes.use(authMiddleware);
+routes.use(moderationMiddleware);
 
 routes.post(
   '/',
   celebrate({
     [Segments.BODY]: Joi.object().keys({
-      name: Joi.string(),
-      number: Joi.number().required(),
-      bookId: Joi.number().integer().min(1).required(),
-      languageId: Joi.number().integer().min(1).required(),
+      name: Joi.string().required(),
+      unicode: Joi.string().required(),
     }),
   }),
-  ChapterController.store,
+  LanguageCOntroller.store,
 );
-
-routes.use(moderationMiddleware);
 
 routes.patch(
   '/:id',
@@ -42,10 +39,10 @@ routes.patch(
     }),
     [Segments.BODY]: Joi.object().keys({
       name: Joi.string(),
-      number: Joi.number().required(),
+      unicode: Joi.string(),
     }),
   }),
-  ChapterController.update,
+  LanguageCOntroller.update,
 );
 
 routes.delete(
@@ -55,7 +52,7 @@ routes.delete(
       id: Joi.number().integer().min(1).required(),
     }),
   }),
-  ChapterController.destroy,
+  LanguageCOntroller.destroy,
 );
 
-export default (app: Router): Router => app.use('/chapter', routes);
+export default (app: Router): Router => app.use('/language', routes);

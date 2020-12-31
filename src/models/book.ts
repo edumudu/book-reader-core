@@ -1,10 +1,10 @@
-import { Entity, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany, ManyToMany } from 'typeorm';
 
 import BaseModel from './baseModel';
-import Category from './category';
 import Chapter from './chapter';
-import Author from './author';
 import Artist from './artist';
+import Author from './author';
+import Category from './category';
 
 @Entity({ name: 'books' })
 class Book extends BaseModel {
@@ -17,8 +17,17 @@ class Book extends BaseModel {
   @Column()
   type!: 'novel' | 'manga';
 
-  @OneToMany(type => Chapter, chaper => chaper.book)
+  @OneToMany(() => Chapter, chaper => chaper.book)
   chapters!: Book[];
+
+  @ManyToMany(() => Artist, artist => artist.books)
+  artists!: Artist[];
+
+  @ManyToMany(() => Author, author => author.books)
+  authors!: Author[];
+
+  @ManyToMany(() => Category, category => category.books)
+  categories!: Category[];
 }
 
 export default Book;

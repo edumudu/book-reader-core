@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class createChapters1608771048629 implements MigrationInterface {
-  private tableName = 'chapters';
+export class createLanguages1608771048628 implements MigrationInterface {
+  private tableName = 'languages';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     return queryRunner.createTable(
@@ -19,21 +19,10 @@ export class createChapters1608771048629 implements MigrationInterface {
           {
             name: 'name',
             type: 'varchar',
-            isNullable: true,
           },
           {
-            name: 'number',
-            type: 'double',
-          },
-          {
-            name: 'bookId',
-            type: 'integer',
-            unsigned: true,
-          },
-          {
-            name: 'languageId',
-            type: 'integer',
-            unsigned: true,
+            name: 'unicode',
+            type: 'varchar',
           },
           {
             name: 'createdAt',
@@ -45,24 +34,6 @@ export class createChapters1608771048629 implements MigrationInterface {
             type: 'timestamp',
             default: 'now()',
             onUpdate: 'now()',
-          },
-        ],
-        foreignKeys: [
-          {
-            name: 'book_chapter',
-            referencedTableName: 'books',
-            referencedColumnNames: ['id'],
-            columnNames: ['bookId'],
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
-          },
-          {
-            name: 'language_chapter',
-            referencedTableName: 'languages',
-            referencedColumnNames: ['id'],
-            columnNames: ['languageId'],
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE',
           },
         ],
       }),

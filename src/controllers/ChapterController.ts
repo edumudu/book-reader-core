@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import Chapter from '../models/chapter';
 import Book from '../models/book';
+import Language from '../models/language';
 
 export default class CaptuloController {
   public static async index(req: Request, res: Response): Promise<Response> {
@@ -12,6 +13,7 @@ export default class CaptuloController {
       order: { id: 'ASC' },
       take: perPage,
       skip: page * perPage - perPage,
+      relations: ['language'],
     });
 
     return res.json({
@@ -26,13 +28,16 @@ export default class CaptuloController {
   }
 
   public static async store(req: Request, res: Response): Promise<Response> {
-    const { name, number, bookId } = req.body;
+    const { name, number, bookId, languageId } = req.body;
 
     try {
       const book = await Book.findOneOrFail({ where: { id: bookId } });
+      const language = await Language.findOneOrFail({ where: { id: languageId } });
       const chapter = Chapter.create({ name, number });
 
       chapter.book = book;
+      chapter.language = language;
+
       await chapter.save();
 
       return res.json({ data: chapter });

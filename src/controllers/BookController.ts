@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { Like } from 'typeorm';
 
 import Book from '../models/book';
+import Artist from '../models/artist';
+import Author from '../models/author';
+import Category from '../models/category';
 
 export default class BookController {
   public static async index(req: Request, res: Response): Promise<Response> {
@@ -14,6 +17,7 @@ export default class BookController {
       order: { title: 'ASC' },
       take: perPage,
       skip: page * perPage - perPage,
+      relations: ['artists', 'authors', 'categories'],
     });
 
     return res.json({
@@ -28,10 +32,17 @@ export default class BookController {
   }
 
   public static async store(req: Request, res: Response): Promise<Response> {
-    const { title, description, type } = req.body as Pick<Book, 'title' | 'description' | 'type'>;
+    const { title, description, type, authorsIds, artistsIds, categoryIds } = req.body;
 
     try {
+      const authors = await Author.findByIds(authorsIds);
+      const artists = await Artist.findByIds(artistsIds);
+      const categories = await Category.findByIds(categoryIds);
       const book = Book.create({ title, description, type });
+
+      book.artists = artists;
+      book.authors = authors;
+      book.categories = categories;
 
       await book.save();
 
@@ -43,14 +54,20 @@ export default class BookController {
 
   public static async update(req: Request, res: Response): Promise<Response> {
     const id = Number(req.params.id);
-    const { title, description, type } = req.body as Pick<Book, 'title' | 'description' | 'type'>;
+    const { title, description, type, authorsIds, artistsIds, categoryIds } = req.body;
 
     try {
+      const authors = await Author.findByIds(authorsIds);
+      const artists = await Artist.findByIds(artistsIds);
+      const categories = await Category.findByIds(categoryIds);
       const book = await Book.findOneOrFail(id);
 
       book.title = title;
       book.description = description;
       book.type = type;
+      book.artists = artists;
+      book.authors = authors;
+      book.categories = categories;
 
       await book.save();
 

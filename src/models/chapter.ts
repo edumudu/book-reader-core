@@ -2,6 +2,7 @@ import { Entity, Column, ManyToOne } from 'typeorm';
 
 import BaseModel from './baseModel';
 import Book from './book';
+import Language from './language';
 // import User from './user';
 
 @Entity({ name: 'chapters' })
@@ -12,8 +13,11 @@ class Chapter extends BaseModel {
   @Column()
   number!: number;
 
-  @ManyToOne(type => Book, book => book.chapters)
+  @ManyToOne(() => Book, book => book.chapters)
   book!: Book;
+
+  @ManyToOne(() => Language, language => language.chapters)
+  language!: Language;
 }
 
 export default Chapter;

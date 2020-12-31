@@ -17,7 +17,7 @@ class User extends BaseModel {
   @Column()
   role!: 'admin' | 'mod' | 'user';
 
-  @OneToMany(type => Organization, organization => organization.user)
+  @OneToMany(() => Organization, organization => organization.user)
   organizations!: Organization[];
 }
 

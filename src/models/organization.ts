@@ -8,7 +8,7 @@ class Organization extends BaseModel {
   @Column()
   name!: string;
 
-  @ManyToOne(type => User, user => user.organizations)
+  @ManyToOne(() => User, user => user.organizations)
   user!: User;
 }
 
